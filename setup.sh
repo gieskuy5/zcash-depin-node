@@ -169,11 +169,16 @@ else
     
     git clone --depth 1 https://github.com/ZcashDePIN/DePINZcash.git /tmp/DePINZcash
     cd /tmp/DePINZcash/prover
+    
+    # Patch timeout from 5s/15s to 30s (Fly.io API can be slow)
+    sed -i 's/timeout(Duration::from_secs(5))/timeout(Duration::from_secs(30))/' src/bin/relay.rs
+    sed -i 's/timeout(Duration::from_secs(15))/timeout(Duration::from_secs(30))/g' src/bin/relay.rs
+    
     cargo build --release --bin depinzcash-relay
     cp target/release/depinzcash-relay "$RELAY_BIN"
     cd "$INSTALL_DIR"
     rm -rf /tmp/DePINZcash
-    log "Relay built successfully"
+    log "Relay built successfully (timeout patched to 30s)"
 fi
 
 # ============================================================
