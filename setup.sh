@@ -17,8 +17,8 @@ INSTALL_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONFIG_DIR="$INSTALL_DIR/config"
 API_URL="https://api.zcashdepin.com"
 
-# Default to full node
-NODE_TYPE="zebra-full"
+# Default to empty (will prompt)
+NODE_TYPE=""
 
 print_banner() {
     echo -e "${CYAN}"
@@ -49,9 +49,33 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-NODE_LABEL="${NODE_LABEL:-$(hostname)-zebra}"
-
 print_banner
+
+# Interactive node type selection if not passed via args
+if [[ -z "$NODE_TYPE" ]]; then
+    echo -e "${YELLOW}Select node type:${NC}"
+    echo ""
+    echo -e "  ${CYAN}1)${NC} Zebra Full Node  ${GREEN}(60 pts/submit, needs 120GB disk)${NC}"
+    echo -e "  ${CYAN}2)${NC} Lightwalletd     ${GREEN}(36 pts/submit, lighter setup)${NC}"
+    echo ""
+    while true; do
+        read -p "Choose [1/2]: " choice
+        case $choice in
+            1) NODE_TYPE="zebra-full"; break ;;
+            2) NODE_TYPE="lightwalletd"; break ;;
+            *) echo -e "${RED}Invalid choice. Enter 1 or 2.${NC}" ;;
+        esac
+    done
+    echo ""
+fi
+
+# Interactive label if not passed
+if [[ -z "$NODE_LABEL" ]]; then
+    DEFAULT_LABEL="$(hostname)-${NODE_TYPE}"
+    read -p "Node label [${DEFAULT_LABEL}]: " NODE_LABEL
+    NODE_LABEL="${NODE_LABEL:-$DEFAULT_LABEL}"
+fi
+
 echo -e "Node type: ${CYAN}$NODE_TYPE${NC}"
 echo -e "Label:     ${CYAN}$NODE_LABEL${NC}"
 echo ""
