@@ -111,14 +111,14 @@ if [[ "$NODE_TYPE" == "zebra-full" ]]; then
         -v /root/zebra/state:/root/.cache/zebra \
         -e ZEBRA_NETWORK__LISTEN_ADDR=0.0.0.0:8233 \
         -e ZEBRA_RPC__LISTEN_ADDR=0.0.0.0:8232 \
+        -e ZEBRA_RPC__ENABLE_COOKIE_AUTH=false \
         -e UID=0 \
         -e GID=0 \
         zfnd/zebra:latest
     log "Zebra full node started (syncing blockchain ~4-24h)"
 else
-    # Lightwalletd setup
-    docker pull electriccoinco/lightwalletd:latest 2>/dev/null || docker pull zfnd/zebra:latest
-    # For lightwalletd we still need a backing Zebra node
+    # Lightwalletd setup — still needs backing Zebra node
+    docker pull zfnd/zebra:latest
     docker run -d \
         --name zebra \
         --restart unless-stopped \
@@ -127,6 +127,7 @@ else
         -v /root/zebra/state:/root/.cache/zebra \
         -e ZEBRA_NETWORK__LISTEN_ADDR=0.0.0.0:8233 \
         -e ZEBRA_RPC__LISTEN_ADDR=0.0.0.0:8232 \
+        -e ZEBRA_RPC__ENABLE_COOKIE_AUTH=false \
         -e UID=0 \
         -e GID=0 \
         zfnd/zebra:latest
